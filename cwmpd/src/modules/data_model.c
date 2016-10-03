@@ -302,6 +302,8 @@ model_func_t ModelFunction[] =
     {"cpe_get_dhcpstatic_yiaddr", cpe_get_dhcpstatic_yiaddr},
     {"cpe_set_dhcpstatic_yiaddr", cpe_set_dhcpstatic_yiaddr},
     {"cpe_set_dhcpstatic_chaddr", cpe_set_dhcpstatic_chaddr},
+
+    {"cpe_reload_qos", cpe_reload_qos}
 };
 
 const char *cwmp_model_ptr_to_func(void *p)

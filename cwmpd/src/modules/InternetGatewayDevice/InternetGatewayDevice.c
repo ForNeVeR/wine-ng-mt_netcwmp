@@ -32,6 +32,7 @@ cpe_reload_all(cwmp_t *cwmp, callback_register_func_t callback_reg)
 #include "TraceRouteDiagnostics/TraceRouteDiagnostics.c"
 #include "DeviceInfo/DeviceInfo.c"
 #include "ManagementServer/ManagementServer.c"
+#include "QueueManagement/QueueManagement.c"
 #include "WANDevice/WANDevice.c"
 #include "WANDevice/WANConnectionDevice/WANConnectionDevice.c"
 #include "WANDevice/WANConnectionDevice/WANIPConnection.c"
