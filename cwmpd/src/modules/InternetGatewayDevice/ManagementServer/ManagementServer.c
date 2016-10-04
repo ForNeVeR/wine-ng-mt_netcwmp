@@ -214,7 +214,7 @@ int
 cpe_get_ms_parameter_key(cwmp_t *cwmp, const char *name, char **value, char *args, pool_t *pool)
 {
     DM_TRACE_GET();
-    *value = cwmp_nvram_pool_get(pool, "env:ParameterKey");
+    *value = cwmp_nvram_pool_get(pool, "cwmp:ParameterKey");
     return FAULT_CODE_OK;
 }
 

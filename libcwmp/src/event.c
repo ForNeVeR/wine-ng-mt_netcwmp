@@ -200,6 +200,8 @@ int cwmp_event_set_value(cwmp_t *cwmp,  int event,   int value, const char * cmd
         value, cmd_key, fault_code,
         (unsigned long long)start, (unsigned long long)end);
 
+    cwmp->new_event = true;
+
     if(event < 0 || event >= INFORM_MAX) {
         cwmp_log_error( "event=%d, max=%d\n", event, INFORM_MAX);
         return CWMP_ERROR;
@@ -311,6 +313,7 @@ int cwmp_event_clear_active(cwmp_t *cwmp)
 
 		switch(pec[i]->event) {
 			case INFORM_BOOTSTRAP:
+				cwmp_event_file_save(cwmp);
 				break;
 			case INFORM_MREBOOT:
 				cwmp->event_global.event_flag |= EVENT_REBOOT_ACS_FLAG;

@@ -74,14 +74,6 @@ static char SOAP_ENC_ARRAYTYPE[CWMP_NAME_MAX] = {0};
 
 #define CWMP_TYPE(x) cwmp_get_type_string(x)
 
-void cwmp_set_request(cwmp_t *cwmp, int state)
-{
-    cwmp_log_trace("%s(cwmp=%p, state=%s): change from %s",
-            __func__, (void*)cwmp, state ? "yes" : "no",
-            cwmp->new_request ? "yes" : "no");
-    cwmp->new_request = state;
-}
-
 static char * cwmp_get_format_string(const char * fmt, ...)
 {
     va_list ap;
@@ -1581,9 +1573,15 @@ parameter_t*  cwmp_parameter_list_add_parameter(env_t * env, pool_t * pool , par
             if (parameter->fault_code != FAULT_CODE_OK) {
                 cwmp_log_error("%s: parameter %s got error (value: %s) [setter: %s]",
                         __func__, name, value, cwmp_model_ptr_to_func((void*)pn->set));
+#if 0
+                /* disable reload task */
+                if (pn->reload) {
+                    queue_uniq_mark_invalid(env->cwmp->queue, pn->reload, TASK_RELOAD_TAG);
+                }
+#endif
             } else if (pn->reload) {
                 /* reload task */
-                queue_push(env->cwmp->queue, pn->reload, TASK_RELOAD_TAG);
+                queue_uniq_push(env->cwmp->queue, pn->reload, TASK_RELOAD_TAG);
             }
         } else {
             cwmp_log_warn("%s: parameter %s has no setter", __func__, name);
@@ -1755,7 +1753,7 @@ s
 */
     if (rc != CWMP_ERROR && parameter_key_node != NULL) {
         parameter_key = cwmp_xml_get_node_value(parameter_key_node);
-        cwmp_conf_set("env:ParameterKey", parameter_key ? parameter_key : "");
+        cwmp_conf_set("cwmp:ParameterKey", parameter_key ? parameter_key : "");
     }
 
     pool_destroy(pool);
@@ -1864,7 +1862,7 @@ int cwmp_parse_addobject_message(env_t * env , xmldoc_t *doc, parameter_node_t *
         return CWMP_ERROR;
     } else if (parameter_key_node != NULL) {
         parameter_key = cwmp_xml_get_node_value(parameter_key_node);
-        cwmp_conf_set("env:ParameterKey", parameter_key ? parameter_key : "");
+        cwmp_conf_set("cwmp:ParameterKey", parameter_key ? parameter_key : "");
     }
 
     *instances = instance_num;
@@ -1937,7 +1935,7 @@ int cwmp_parse_deleteobject_message(env_t * env , xmldoc_t *doc, parameter_node_
 
     if (parameter_key_node != NULL) {
         parameter_key = cwmp_xml_get_node_value(parameter_key_node);
-        cwmp_conf_set("env:ParameterKey", parameter_key ? parameter_key : "");
+        cwmp_conf_set("cwmp:ParameterKey", parameter_key ? parameter_key : "");
     }
 
     return CWMP_OK;

@@ -60,7 +60,6 @@ int cwmp_set_var(cwmp_t * cwmp)
     cwmp_log_trace("%s(cwmp=%p)", __func__, (void*)cwmp);
 
     cwmp_bzero(cwmp, sizeof(cwmp_t));
-	cwmp_set_request(cwmp, CWMP_TRUE);
     pool_t * pool = pool_create(POOL_DEFAULT_SIZE);
     cwmp->pool = pool;
 
@@ -102,7 +101,7 @@ int main(int argc, char **argv)
 //    pid = getpid();
 
     cwmp_global_pool = pool_create(POOL_DEFAULT_SIZE);
-    cwmp = pool_palloc(cwmp_global_pool, sizeof(cwmp_t));
+    cwmp = pool_pcalloc(cwmp_global_pool, sizeof(cwmp_t));
 
     cwmp_conf_open("/etc/cwmp.conf");
 

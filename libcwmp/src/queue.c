@@ -27,6 +27,7 @@ void queue_add(queue_t *q, void * data, int type, int priority, void * arg1, voi
 	node->datatype = type;
 	node->priority = priority;
 	node->next = NULL;
+	node->ignore = false;
 
 	pthread_mutex_lock(&q->mutex);
 
@@ -53,6 +54,41 @@ void queue_add(queue_t *q, void * data, int type, int priority, void * arg1, voi
 
 }
 
+void queue_uniq_push(queue_t *q, void * data, int type) {
+	qnode_t *node;
+
+	cwmp_log_trace("%s(q=%p, data=%p, type=%d)",
+			__func__, (void*)q, (void*)data, type);
+	/* find equal data */
+	pthread_mutex_lock(&q->mutex);
+	for (node = q->first; node; node = node->next) {
+		if (node->datatype == type && node->data == data) {
+			/* already exists */
+			return;
+		}
+	}
+	pthread_mutex_unlock(&q->mutex);
+	/* push */
+	queue_push(q, data, type);
+}
+
+void queue_uniq_mark_invalid(queue_t *q, void *data, int type) {
+	qnode_t *node;
+
+	cwmp_log_trace("%s(q=%p, data=%p, type=%d)",
+			__func__, (void*)q, (void*)data, type);
+	/* prevent insertion */
+	queue_uniq_push(q, data, type);
+	/* mark */
+	pthread_mutex_lock(&q->mutex);
+	for (node = q->first; node; node = node->next) {
+		if (node->datatype == type && node->data == data) {
+			node->ignore = true;
+		}
+	}
+	pthread_mutex_unlock(&q->mutex);
+}
+
 void queue_push(queue_t *q, void * data, int type) {
 	qnode_t *node;
 
@@ -72,6 +108,7 @@ void queue_push(queue_t *q, void * data, int type) {
 	node->datatype = type;
 	node->priority = QUEUE_PRIORITY_COMMON;
 	node->next = NULL;
+	node->ignore = false;
 
 	pthread_mutex_lock(&q->mutex);
 
@@ -111,32 +148,41 @@ void queue_view(queue_t *q) {
 
 
 int queue_pop(queue_t *q, void ** data, void **arg1, void **arg2) {
+	qnode_t *p = NULL;
+	int type = -1;
+
 	cwmp_log_trace("%s(q=%p, data=%p, arg1=%p, arg2=%p)",
             __func__, (void*)q, (void*)data, (void*)arg1, (void*)arg2);
-	if(q->first == NULL) {
-		cwmp_log_debug("queue is empty.");
-		return -1;
-	}
-	qnode_t *p;
-	int type ;
+
 	pthread_mutex_lock(& q->mutex);
+	while (q->first) {
+		p = q->first;
 
-	void *c=q->first->data;
-	void *a1=q->first->arg1;
-	void *a2=q->first->arg2;
-	p=q->first;
-	type = p->datatype;
-	q->first=q->first->next;
-	if(q->first == NULL) q->last = NULL;
-	free(p);
-	q->size--;
-	pthread_mutex_unlock(& q->mutex);
+		if (p->ignore) {
+			/* skip */
+			cwmp_log_debug("queue: ignore data=%p, type=%d",
+					p->data, p->datatype);
+		} else {
+			*data = p->data;
+			*arg1 = p->arg1;
+			*arg2 = p->arg2;
+			type = p->datatype;
+		}
 
-	*data = c;
-	if (arg1)
-		*arg1 = a1;
-	if (arg2)
-		*arg2 = a2;
+		q->first = p->next;
+		if(q->first == NULL) {
+			q->last = NULL;
+		}
+
+		free(p);
+		q->size--;
+	}
+	pthread_mutex_unlock(&q->mutex);
+
+	if(type == -1) {
+		cwmp_log_debug("queue is empty.");
+	}
+
 	return type;
 }
 

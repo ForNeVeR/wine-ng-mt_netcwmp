@@ -220,8 +220,8 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
     cwmp_log_trace("%s(cwmp=%p)", __func__, (void*)cwmp);
 
     while (TRUE) {
-        if (cwmp->new_request == CWMP_NO) {
-            cwmp_log_debug("http session: No new request from ACS");
+        if (cwmp->new_request == CWMP_NO && cwmp->new_event == CWMP_NO) {
+            cwmp_log_debug("http session: No new events");
 
             sleep(1);
             periodic++;
@@ -243,13 +243,18 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
                 }
                 periodic = 0;
             }
-        } else {
+        } else if (cwmp->new_request) {
             cwmp_log_debug("http session: ### ### ### New request from ACS ### ### ###");
+        } else if (cwmp->new_event) {
+            cwmp_log_debug("http session: ### ### ### New event ### ### ###");
         }
 
-        cwmp_log_info("http session: open (requested=%s)",
-                cwmp->new_request ? "yes" : "no");
-        cwmp_set_request(cwmp, CWMP_NO);
+        cwmp_log_info("http session: open (requested=%s, evented=%s)",
+                cwmp->new_request ? "yes" : "no",
+                cwmp->new_event ? "yes" : "no");
+        cwmp->new_request = false;
+        cwmp->new_event = false;
+
         session = cwmp_session_create(cwmp);
         session_close  = CWMP_NO;
         cwmp_session_open(session);
@@ -379,11 +384,7 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
         cwmp_session_free(session);
         session = NULL;
 
-        int newtaskres = cwmp_agent_run_tasks(cwmp);
-        if(newtaskres == CWMP_YES)
-        {
-            cwmp_set_request(cwmp, CWMP_YES);
-        }
+        cwmp_agent_run_tasks(cwmp);
     }//end while(TRUE)
 }
 
@@ -833,42 +834,10 @@ int cwmp_agent_upload_file(cwmp_t * cwmp, upload_arg_t * ularg)
     return faultcode;
 }
 
-/* TODO: to extern library */
-static void
-unique_add_ptr(void ***ptrs, size_t *count, void *new_ptr)
-{
-    size_t rcount = *count;
-    void **rptrs = *ptrs;
-    size_t i = 0u;
-    if (!rptrs) {
-        rcount = 0u;
-    }
-
-    if (!new_ptr)
-        return;
-
-    for (i = 0u; i < rcount; i++) {
-        if (rptrs[i] == new_ptr)
-            return;
-    }
-    rptrs = (void**)realloc(rptrs, sizeof(void*) * rcount + 2);
-    if (!rptrs) {
-        cwmp_log_error("realloc(%d) failed: %s",
-                (sizeof(void*) * rcount + 2), strerror(errno));
-        return;
-    }
-    rptrs[rcount++] = new_ptr;
-    rptrs[rcount] = NULL;
-    *count = rcount;
-    *ptrs = rptrs;
-}
-
 /* */
 
 int cwmp_agent_run_tasks(cwmp_t * cwmp)
 {
-	void ** reload_scripts = NULL;
-	size_t reload_count = 0u;
 	void * data;
 	void * arg1;
 	void * arg2;
@@ -932,7 +901,6 @@ int cwmp_agent_run_tasks(cwmp_t * cwmp)
 
 			case TASK_NOTIFY_TAG:
 				{
-                    cwmp_set_request(cwmp, CWMP_YES);
 					cwmp_event_set_value(cwmp, INFORM_VALUECHANGE, 1, NULL, 0, 0, 0);
 				}
 				break;
@@ -953,10 +921,12 @@ int cwmp_agent_run_tasks(cwmp_t * cwmp)
 				break;
 			case TASK_RELOAD_TAG:
 				{
-                    cwmp_log_debug("unqueue reload callback: %s",
+                    cwmp_log_debug("execute reload callback: %s",
                             cwmp_model_ptr_to_func(data));
-					/* uniqulize poiters */
-					unique_add_ptr(&reload_scripts, &reload_count, data);
+                    if ((*(parameter_reload_handler_pt)data)(cwmp, callback_register_task) == FAULT_CODE_OK) {
+                        cwmp_log_error("reload function %s got error",
+                                cwmp_model_ptr_to_func(data));
+                    }
 				}
 				break;
 			default:
@@ -964,20 +934,6 @@ int cwmp_agent_run_tasks(cwmp_t * cwmp)
 				break;
 
 		}
-	}
-	if (reload_scripts) {
-		/* execute functions */
-		int rval = 0;
-		size_t i = 0u;
-		for (; i < reload_count; i++) {
-			rval = (*(parameter_reload_handler_pt)reload_scripts[i])(cwmp, callback_register_task);
-			if (rval == FAULT_CODE_OK) {
-				continue;
-			}
-			cwmp_log_error("reload function %s got error",
-					cwmp_model_ptr_to_func(reload_scripts[i]));
-		}
-		free(reload_scripts);
 	}
 
 	return ok;

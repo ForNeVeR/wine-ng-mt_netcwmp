@@ -29,6 +29,7 @@ struct qnode_t {
 	void *arg2;
 	int	datatype;
 	int 	priority;
+	bool ignore;
 	struct qnode_t *next;
 } ;
 
@@ -42,6 +43,12 @@ struct queue_t {
 
 void queue_add(queue_t *q, void * data, int type, int priority, void * arg1, void *arg2);
 void queue_push(queue_t *q, void* data, int type);
+
+/* mark uniq node as invalid (drop reservation on while(pop())) */
+void queue_uniq_mark_invalid(queue_t *q, void *data, int type);
+/* add unique node (data, type) in queue */
+void queue_uniq_push(queue_t *q, void * data, int type);
+
 int queue_pop(queue_t *q, void ** data, void ** arg1, void ** arg2);
 void queue_view(queue_t *q);
 queue_t *queue_create(pool_t * pool);
