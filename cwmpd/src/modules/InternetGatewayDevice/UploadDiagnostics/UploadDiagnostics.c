@@ -296,7 +296,7 @@ cpe_get_ud(cwmp_t *cwmp, const char *name, char **value, char *args, pool_t *poo
 	}
 
 	if (tm) {
-		len = strftime(buf, sizeof(buf), "%DT%T", tm);
+		len = strftime(buf, sizeof(buf), "%F%T", tm);
 		snprintf(buf + len, sizeof(buf) - len, ".%ld", usec);
 	}
 

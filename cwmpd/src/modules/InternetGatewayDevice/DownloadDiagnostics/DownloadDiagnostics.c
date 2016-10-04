@@ -212,7 +212,7 @@ cpe_get_dd_result(cwmp_t *cwmp, const char *name, char **value, char *args, pool
 		usec = ddiagnostics.hs.tcp_response.tv_usec;
 	}
 	if (tm) {
-		len = strftime(buf, sizeof(buf), "%DT%T", tm);
+		len = strftime(buf, sizeof(buf), "%FT%T", tm);
 		snprintf(buf + len, sizeof(buf) - len, ".%ld", usec);
 	}
 
