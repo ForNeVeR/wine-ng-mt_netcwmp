@@ -130,6 +130,8 @@ int cwmp_event_set_value(cwmp_t *cwmp,  int event,   int value, const char * cmd
 int cwmp_event_clear_active(cwmp_t *cwmp);
 int cwmp_event_file_save(cwmp_t *cwmp);
 
+int cwmp_event_time_init(cwmp_t * cwmp, const char *stime);
+
 #endif
 
 

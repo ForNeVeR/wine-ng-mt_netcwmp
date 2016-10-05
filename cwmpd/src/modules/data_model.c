@@ -303,6 +303,9 @@ model_func_t ModelFunction[] =
     {"cpe_set_dhcpstatic_yiaddr", cpe_set_dhcpstatic_yiaddr},
     {"cpe_set_dhcpstatic_chaddr", cpe_set_dhcpstatic_chaddr},
 
+    {"cpe_get_ms_periodic_inform_time", cpe_get_ms_periodic_inform_time},
+    {"cpe_set_ms_periodic_inform_time", cpe_set_ms_periodic_inform_time},
+
     {"cpe_reload_qos", cpe_reload_qos}
 };
 

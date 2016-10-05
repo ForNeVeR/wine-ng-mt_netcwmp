@@ -148,7 +148,7 @@
 				<param name="Password" rw="1" get_func="cpe_get_igd_ms_password" set_func="cpe_set_igd_ms_password"/>
 				<param name="PeriodicInformEnable" rw="1" get_func="cpe_get_ms_periodic_inform_enable" set_func="cpe_set_ms_periodic_inform_enable"/>
 				<param name="PeriodicInformInterval" rw="1" get_func="cpe_get_ms_periodic_inform_interval" set_func="cpe_set_ms_periodic_inform_interval"/>
-				<param name="PeriodicInformTime" rw="1" get_func="cpe_get_const_string" set_func="cpe_set_null" args="0000-00-00T00:00:00"/>
+				<param name="PeriodicInformTime" rw="1" get_func="cpe_get_ms_periodic_inform_time" set_func="cpe_set_ms_periodic_inform_time"/>
 			</object>
 			<object name="Services">
 				<object name="X_COM_IPTV">

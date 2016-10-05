@@ -157,6 +157,27 @@ int cpe_set_igd_ms_connectionrequestpassword(cwmp_t * cwmp, const char * name, c
 }
 
 int
+cpe_get_ms_periodic_inform_time(cwmp_t *cwmp, const char *name, char **value, char *args, pool_t *pool)
+{
+    DM_TRACE_GET();
+    *value = cwmp_nvram_pool_get(pool, "cwmpd:inform_periodic_time");
+    if (!*value) {
+        *value = "0000-00-00T00:00:00";
+    }
+    return FAULT_CODE_OK;
+}
+
+int
+cpe_set_ms_periodic_inform_time(cwmp_t * cwmp, const char * name, const char * value, int length, char * args, callback_register_func_t callback_reg)
+{
+    DM_TRACE_SET();
+    /* TODO: check value */
+    cwmp_nvram_set("cwmpd:inform_periodic_time", value);
+    cwmp_event_time_init(cwmp, value);
+    return FAULT_CODE_OK;
+}
+
+int
 cpe_set_ms_periodic_inform_interval(cwmp_t * cwmp, const char * name, const char * value, int length, char * args, callback_register_func_t callback_reg)
 {
     char buf[42] = {};

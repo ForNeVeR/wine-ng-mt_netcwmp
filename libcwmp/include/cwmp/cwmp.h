@@ -362,6 +362,7 @@ struct cwmp_st
 	struct {
 		bool periodic_enable;
 		unsigned long periodic_interval;
+		time_t periodic_time;
 	} conf;
 
 #ifdef USE_CWMP_OPENSSL

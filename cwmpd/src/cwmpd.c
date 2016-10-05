@@ -65,6 +65,7 @@ int cwmp_set_var(cwmp_t * cwmp)
 
 
     cwmp_event_init(cwmp);
+    cwmp_event_time_init(cwmp, NULL);
 
     cwmp->queue = queue_create(pool);
 

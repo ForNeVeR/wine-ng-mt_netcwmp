@@ -211,7 +211,7 @@ int cwmp_agent_recv_response(cwmp_session_t * session)
 void cwmp_agent_start_session(cwmp_t * cwmp)
 {
     int rv;
-    unsigned int periodic = 0;
+    unsigned long long periodic = 0;
     cwmp_session_t * session;
     int session_close = CWMP_NO;
     xmldoc_t * newdoc;
@@ -221,16 +221,18 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
 
     while (TRUE) {
         if (cwmp->new_request == CWMP_NO && cwmp->new_event == CWMP_NO) {
-            cwmp_log_debug("http session: No new events");
-
             sleep(1);
-            periodic++;
 
             if (!cwmp->conf.periodic_enable) {
+                cwmp_log_debug("http session: No new events");
                 continue;
             }
 
-            if (periodic < cwmp->conf.periodic_interval) {
+            if (periodic) {
+                periodic--;
+                if (!(periodic % 10) || periodic < 10) {
+                    cwmp_log_debug("http session: seconds in idle: %llu", periodic);
+                }
                 continue;
             } else {
                 /* FIXME: wtf?
@@ -242,11 +244,12 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
                     queue_push(cwmp->queue, NULL, TASK_NOTIFY_TAG);
                 }
                 periodic = 0;
+                cwmp_log_debug("http session: ### ### ### Periodic event ### ### ###");
             }
         } else if (cwmp->new_request) {
             cwmp_log_debug("http session: ### ### ### New request from ACS ### ### ###");
         } else if (cwmp->new_event) {
-            cwmp_log_debug("http session: ### ### ### New event ### ### ###");
+            cwmp_log_debug("http session: ### ### ### New internal event ### ### ###");
         }
 
         cwmp_log_info("http session: open (requested=%s, evented=%s)",
@@ -385,6 +388,26 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
         session = NULL;
 
         cwmp_agent_run_tasks(cwmp);
+        /* calc timeout for periodic */
+        if (cwmp->conf.periodic_enable) {
+            struct tm *tm = NULL;
+            time_t ctime = 0u;
+            char ftime[42] = {};
+
+            time(&ctime);
+            periodic = cwmp->conf.periodic_interval -
+                ((ctime - cwmp->conf.periodic_time) %
+                 cwmp->conf.periodic_interval);
+
+            ctime = ctime + periodic;
+            tm = gmtime(&ctime);
+            strftime(ftime, sizeof(ftime), "%F %T", tm);
+
+            cwmp_log_debug("http session: next periodic at %s "
+                    "(time: %"PRIuPTR", interval: %lu, reaming: %llu)",
+                    ftime, cwmp->conf.periodic_time,
+                    cwmp->conf.periodic_interval, periodic);
+        }
     }//end while(TRUE)
 }
 

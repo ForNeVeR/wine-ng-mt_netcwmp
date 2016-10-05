@@ -83,6 +83,40 @@ int cwmp_event_list_init(pool_t * pool, event_list_t * el)
     return CWMP_OK;
 }
 
+int cwmp_event_time_init(cwmp_t * cwmp, const char *stime)
+{
+    char stime_s[INI_BUFFERSIZE] = {};
+    time_t ptime = 0u;
+    struct tm tm = {};
+
+    cwmp_log_trace("%s(cwmp=%p)", __func__, (void*)cwmp);
+    if (!stime) {
+        cwmp_conf_get("cwmpd:inform_periodic_time", stime_s);
+    } else {
+        strncpy(stime_s, stime, sizeof(stime_s) - 1);
+    }
+    if (!*stime_s) {
+        goto write;
+    } else {
+        strptime(stime_s, "%Y-%m-%dT%H:%M:%S", &tm);
+        if ((ptime = mktime(&tm)) == -1) {
+            goto write;
+
+        }
+    }
+    cwmp->conf.periodic_time = ptime;
+    return CWMP_OK;
+write:
+    {
+        struct tm *ptm = NULL;
+        time(&ptime);
+        ptm = gmtime(&ptime);
+        strftime(stime_s, sizeof(stime_s), "%Y-%m-%dT%H:%M:%S", ptm);
+        cwmp_conf_set("cwmpd:inform_periodic_time", stime_s);
+    }
+    cwmp->conf.periodic_time = ptime;
+    return CWMP_OK;
+}
 
 int cwmp_event_global_init(cwmp_t * cwmp)
 {
