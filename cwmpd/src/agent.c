@@ -231,7 +231,7 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
             if (periodic) {
                 periodic--;
                 if (!(periodic % 10) || periodic < 10) {
-                    cwmp_log_debug("http session: seconds in idle: %llu", periodic);
+                    cwmp_log_debug("http session: reaming seconds in idle: %llu", periodic);
                 }
                 continue;
             } else {
