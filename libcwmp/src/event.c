@@ -186,7 +186,7 @@ int cwmp_event_init(cwmp_t *cwmp)
 
     if(!cwmp)
     {
-        cwmp_log_error("param cwmp is NULL\n");
+        cwmp_log_error("param cwmp is NULL");
         return CWMP_ERROR;
     }
 
@@ -205,7 +205,7 @@ int cwmp_event_init(cwmp_t *cwmp)
     }
     else    //reboot
     {
-        cwmp_log_info("reboot_flag=%d, key=%s\n",
+        cwmp_log_info("reboot_flag=%d, key=%s",
                 cwmp->event_global.event_flag, cwmp->event_global.event_key);
         cwmp_event_set_value(cwmp, INFORM_BOOT, 1, NULL, 0, 0, 0);
         if(cwmp->event_global.event_flag & EVENT_REBOOT_ACS_FLAG)
@@ -237,7 +237,7 @@ int cwmp_event_set_value(cwmp_t *cwmp,  int event,   int value, const char * cmd
     cwmp->new_event = true;
 
     if(event < 0 || event >= INFORM_MAX) {
-        cwmp_log_error( "event=%d, max=%d\n", event, INFORM_MAX);
+        cwmp_log_error( "event=%d, max=%d", event, INFORM_MAX);
         return CWMP_ERROR;
     }
     int count = cwmp->el->count;
@@ -309,7 +309,7 @@ size_t cwmp_write_callback(void *ptr, size_t size, size_t nmemb, void *data)
     memorystruct_t  *mem = (memorystruct_t*)data;
 
     if(!mem || !ptr) {
-        cwmp_log_error( "ptr or data is NULL\n");
+        cwmp_log_error( "ptr or data is NULL");
         return 0;
     }
 
@@ -418,7 +418,7 @@ static int get_active_event_list(cwmp_t *cwmp, event_list_t **pevent_list, int *
 
     if(!cwmp || !pevent_list || !pevt_count)
     {
-        cwmp_log_error( "param is NULL\n");
+        cwmp_log_error( "param is NULL");
         return CWMP_ERROR;
     }
 
@@ -432,7 +432,7 @@ static int get_active_event_list(cwmp_t *cwmp, event_list_t **pevent_list, int *
             if(!evlist)
             {
                 ret = CWMP_ERROR;
-                cwmp_log_error( "realloc fail\n");
+                cwmp_log_error( "realloc fail");
                 break;
             }
             memcpy(&evlist[count], &cwmp->event_info[i], sizeof(event_list_t));

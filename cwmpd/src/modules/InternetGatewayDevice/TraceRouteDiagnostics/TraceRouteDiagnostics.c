@@ -79,7 +79,7 @@ trd_process(FILE *f, struct trd_HopHost *hops, size_t max_hops)
 	size_t nmatch = sizeof(pmatch) / sizeof(*pmatch);
 
 	if ((r = regcomp(&preg, reg, REG_EXTENDED)) != 0) {
-		cwmp_log_error("regcomp(): %d\n", r);
+		cwmp_log_error("regcomp(): %d", r);
 		return 0;
 	}
 

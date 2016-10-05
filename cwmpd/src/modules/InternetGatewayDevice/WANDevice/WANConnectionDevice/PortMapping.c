@@ -148,12 +148,12 @@ pm_parse_regex(regex_t *preg, const char *pattern,
 	}
 	rc = regcomp(preg, pattern, 0);
 	if (rc != 0) {
-		cwmp_log_warn("PortMapping: regcomp(\"%s\") failed: %d\n", pattern, rc);
+		cwmp_log_warn("PortMapping: regcomp(\"%s\") failed: %d", pattern, rc);
 		return 0u;
 	}
 	rc = regexec(preg, in, out_size, out, 0);
 	if (rc != 0) {
-		cwmp_log_warn("PortMapping: regexec(\"%s\", \"%s\") failed: %d\n",
+		cwmp_log_warn("PortMapping: regexec(\"%s\", \"%s\") failed: %d",
 				pattern, in, rc);
 		regfree(preg);
 		return 0u;
@@ -340,18 +340,18 @@ pm_parse(const char *in, struct pm_rule *rule)
 	/* check values */
 	if (rule->dport_max > 0 || rule->sport_max > 0) {
 		if (rule->sport_max && rule->sport_max < rule->sport_min) {
-			cwmp_log_warn("PortMapping: src-port-max can't be less src-port-min\n");
+			cwmp_log_warn("PortMapping: src-port-max can't be less src-port-min");
 			/* parse next */
 			return pm_parse(next, rule);
 		}
 
 		if (rule->dport_max && rule->dport_max < rule->dport_min) {
-			cwmp_log_warn("PortMapping: dst-port-max can't be less dst-port-min\n");
+			cwmp_log_warn("PortMapping: dst-port-max can't be less dst-port-min");
 			return pm_parse(next, rule);
 		}
 
 		if (rule->dport_max - rule->dport_min != rule->sport_max - rule->sport_min) {
-				cwmp_log_warn("PortMapping: dst-port and src-port ranges not match\n");
+				cwmp_log_warn("PortMapping: dst-port and src-port ranges not match");
 			return pm_parse(next, rule);
 		}
 	}

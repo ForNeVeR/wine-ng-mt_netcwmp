@@ -349,7 +349,7 @@ static bool nvram_wlan_save(unsigned index, struct wlan_security_mode *wsm)
 
 int cpe_get_igd_lan_wlan_bssid(cwmp_t * cwmp, const char * name, char ** value, char * args, pool_t * pool)
 {
-    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_bssid\n");
+    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_bssid");
     char if_hw[18] = {0};
 
     char* ifstart = cwmp_nvram_pool_get(pool,"BssidIfName");
@@ -360,7 +360,7 @@ int cpe_get_igd_lan_wlan_bssid(cwmp_t * cwmp, const char * name, char ** value, 
     if (getIfMac(ifname, if_hw, ':') == -1) *value = pool_pstrdup(pool,"00:00:00:00:00:00");
     else *value = pool_pstrdup(pool,if_hw);
 
-    cwmp_log_debug("DEBUG cpe_get_igd_lan_wlan_bssid: BSSID%s %s \n",args,*value);
+    cwmp_log_debug("DEBUG cpe_get_igd_lan_wlan_bssid: BSSID%s %s",args,*value);
 
     return FAULT_CODE_OK;
 }
@@ -368,7 +368,7 @@ int cpe_get_igd_lan_wlan_bssid(cwmp_t * cwmp, const char * name, char ** value, 
 
 int cpe_get_igd_lan_wlan_autochannel(cwmp_t * cwmp, const char * name, char ** value, char * args, pool_t * pool)
 {
-    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_autochannel\n");
+    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_autochannel");
     int chan =  cwmp_nvram_get_int("Channel", 0);
     int autoselect = cwmp_nvram_get_int("AutoChannelSelect",1);
 
@@ -379,7 +379,7 @@ int cpe_get_igd_lan_wlan_autochannel(cwmp_t * cwmp, const char * name, char ** v
 
 int cpe_set_igd_lan_wlan_autochannel(cwmp_t * cwmp, const char * name, const char * value, int length, callback_register_func_t callback_reg)
 {
-    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_autochannel\n");
+    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_autochannel");
     if (value == NULL) {
 	cwmp_log_error("cpe_get_igd_lan_wlan_autochannel: undefined value!");
 	return FAULT_CODE_9002;
@@ -401,7 +401,7 @@ int cpe_set_igd_lan_wlan_autochannel(cwmp_t * cwmp, const char * name, const cha
 
 int cpe_get_igd_lan_wlan_channel(cwmp_t * cwmp, const char * name, char ** value, char * args, pool_t * pool)
 {
-    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_channel\n");
+    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_channel");
     char* chan =  cwmp_nvram_pool_get(pool, "Channel");
     if (chan == NULL)
     {
@@ -426,7 +426,7 @@ int cpe_get_igd_lan_wlan_channel(cwmp_t * cwmp, const char * name, char ** value
 
 int cpe_set_igd_lan_wlan_channel(cwmp_t * cwmp, const char * name, const char * value, int length, callback_register_func_t callback_reg)
 {
-    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_channel\n");
+    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_channel");
 
     if (value == NULL) {
 	cwmp_log_error("cpe_get_igd_lan_wlan_channel: undefined value!");
@@ -449,7 +449,7 @@ int cpe_set_igd_lan_wlan_channel(cwmp_t * cwmp, const char * name, const char * 
 
 int cpe_get_igd_lan_wlan_standard(cwmp_t * cwmp, const char * name, char ** value, char * args, pool_t * pool)
 {
-    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_standard\n");
+    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_standard");
     int standard =  cwmp_nvram_get_int("WirelessMode", 9);
 
     char* stdstr;
@@ -466,7 +466,7 @@ int cpe_get_igd_lan_wlan_standard(cwmp_t * cwmp, const char * name, char ** valu
     }
 
     *value = pool_pstrdup(pool, stdstr);
-    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_standard %s\n",stdstr);
+    cwmp_log_debug("DEBUG: cpe_get_igd_lan_wlan_standard %s",stdstr);
 
     return FAULT_CODE_OK;
 }
@@ -482,7 +482,7 @@ int cpe_set_igd_lan_wlan_standard(cwmp_t * cwmp, const char * name, const char *
 
     cwmp_nvram_set("WirelessMode", valStr);
 
-    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_standard %s \n", valStr);
+    cwmp_log_debug("DEBUG: cpe_set_igd_lan_wlan_standard %s", valStr);
 
     return FAULT_CODE_OK;
 }

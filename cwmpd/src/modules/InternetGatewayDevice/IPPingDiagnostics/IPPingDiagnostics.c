@@ -120,7 +120,7 @@ read_ping_data(FILE *f)
 				/* iputils: "PING localhost (127.0.0.1) 56(84) bytes of data.\n" */
 				pv = PING_IPUTILS;
 			} else {
-				cwmp_log_error("IPPingDiagnostics: Unknown ping version\n");
+				cwmp_log_error("IPPingDiagnostics: Unknown ping version");
 				break;
 			}
 		}

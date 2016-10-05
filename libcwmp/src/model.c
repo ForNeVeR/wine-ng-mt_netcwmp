@@ -80,7 +80,7 @@ int cwmp_model_copy_parameter(parameter_node_t * param, parameter_node_t ** new_
 
     if (!new_node)
     {
-        cwmp_log_error("cwmp model copy parameter malloc new node failed ...\n");
+        cwmp_log_error("cwmp model copy parameter malloc new node failed ...");
         return CWMP_ERROR;
     }
 
@@ -453,7 +453,7 @@ int cwmp_model_load_parameter(cwmp_t * cwmp, xmldoc_t * doc, model_func_t * func
         return CWMP_ERROR;
     }
 
-    cwmp_log_debug("model load: xml node name is %s\n", root_node->nodeName);
+    cwmp_log_debug("model load: xml node name is %s", root_node->nodeName);
     model_node = cwmp_xml_get_child_with_name(root_node, DEVICE_MODEL_NODE);
     if (model_node == NULL)
     {
@@ -468,7 +468,7 @@ int cwmp_model_load_parameter(cwmp_t * cwmp, xmldoc_t * doc, model_func_t * func
     cwmp->root = root_param->child;
 
     cwmp_model_init_object(cwmp, cwmp->root);
-    cwmp_log_debug("DEBUG: cwmp_model_load_parameter OK\n");
+    cwmp_log_debug("DEBUG: cwmp_model_load_parameter OK");
     return CWMP_OK;
 }
 
@@ -483,7 +483,7 @@ int cwmp_model_load_xml(cwmp_t * cwmp, const char * xmlfile, model_func_t * func
 
     if(!fp)
     {
-        cwmp_log_error("xmlfile is NULL\n");
+        cwmp_log_error("xmlfile is NULL");
         return CWMP_ERROR;
     }
 
@@ -494,7 +494,7 @@ int cwmp_model_load_xml(cwmp_t * cwmp, const char * xmlfile, model_func_t * func
     char * buf = (char*)MALLOC(sizeof(char)*(xmllen+1));
     if(!buf)
     {
-        cwmp_log_error("model load: malloc fail\n");
+        cwmp_log_error("model load: malloc fail");
         goto finish;
     }
     fseek(fp, 0, SEEK_SET);
@@ -504,7 +504,7 @@ int cwmp_model_load_xml(cwmp_t * cwmp, const char * xmlfile, model_func_t * func
     doc = XmlParseBuffer(pool, buf);
     if (!doc)
     {
-        cwmp_log_error("model load: create doc faild\n");
+        cwmp_log_error("model load: create doc faild");
         goto finish;
     }
 

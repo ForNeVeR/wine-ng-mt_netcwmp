@@ -953,7 +953,7 @@ int cwmp_agent_run_tasks(cwmp_t * cwmp)
 				}
 				break;
 			default:
-					cwmp_log_error("ERROR: Unknown task tag \"%s\" \n", tasktype);
+					cwmp_log_error("ERROR: Unknown task tag \"%s\"", tasktype);
 				break;
 
 		}

@@ -262,7 +262,7 @@ int cwmp_session_get_localip(char *hostip)
     he = *pHostent;
 
 
-    cwmp_log_debug("name=%s\naliases=%s\naddrtype=%d\nlength=%d\n",
+    cwmp_log_debug("name=%s\naliases=%s\naddrtype=%d\nlength=%d",
                    he.h_name, he.h_aliases, he.h_addrtype, he.h_length);
 
 

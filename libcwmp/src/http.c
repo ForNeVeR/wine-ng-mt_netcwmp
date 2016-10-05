@@ -129,7 +129,7 @@ int http_socket_calloc(http_socket_t **news, pool_t * pool)
 
     if ((*news) == NULL)
     {
-        cwmp_log_error("socket create pool pcalloc null.\n");
+        cwmp_log_error("socket create pool pcalloc null.");
         return CWMP_ERROR;
     }
 
@@ -137,7 +137,7 @@ int http_socket_calloc(http_socket_t **news, pool_t * pool)
     if ((*news)->addr == NULL)
     {
         (*news) = NULL;
-        cwmp_log_error("http_sockaddr_t  pool pcalloc  null.\n");
+        cwmp_log_error("http_sockaddr_t  pool pcalloc  null.");
         return CWMP_ERROR;
     }
     (*news)->sockdes = -1;
@@ -173,7 +173,7 @@ int http_socket_create(http_socket_t **news, int family, int type, int protocol,
 
     if ((*news)->sockdes == -1)
     {
-        cwmp_log_error("sockdes is -1.\n");
+        cwmp_log_error("sockdes is -1.");
         return - errno;
     }
 
@@ -560,7 +560,7 @@ int http_socket_read (http_socket_t * sock, char *buf, int bufsize)
 //        cwmp_log_error("http_socket_read ERRNO: %d, res %d, buf %d, bufsize %d", errno, res, buf, bufsize);
 /*	if (res == 1) {
 	    buf[1] = 0;
-            cwmp_log_error("%s\n", buf);
+            cwmp_log_error("%s", buf);
 	}
 	else
 	{
@@ -880,7 +880,7 @@ nohost:
     return CWMP_OK;
 
 outoff:
-    cwmp_log_error("parse url error.\n");
+    cwmp_log_error("parse url error.");
     return CWMP_ERROR;
 }
 
@@ -1141,7 +1141,7 @@ int http_read_request(http_socket_t * sock, http_request_t * request, pool_t * p
 
 
     len = cwmp_chunk_copy(data, header, 2047);
-    cwmp_log_debug("http read request: %s\n", data);
+    cwmp_log_debug("http read request: %s", data);
     bytes += len;
     lines = http_split_headers(data, len, line);
 
@@ -1537,7 +1537,7 @@ int http_read_response(http_socket_t * sock, http_response_t * response, pool_t 
     rc = http_read_body(sock, cont_len);//, &body, pool);
     if (rc < 0 || (code != 200 && code != 204))
     {
-        cwmp_log_debug("Http read response code is (%d)\n", code);
+        cwmp_log_debug("http read response code is (%d)", code);
     }
     cwmp_log_debug("http_read_response OK");
     gettimeofday(&sock->stat.transmission_rx_end, NULL);
@@ -2246,7 +2246,7 @@ int http_receive_file(const char *fromurl, const char * tofile, struct http_stat
     if (tofile) {
         tf = fopen(tofile, "wb+");
         if(!tf) {
-            cwmp_log_error("Unable to create target file: %s\n", tofile);
+            cwmp_log_error("Unable to create target file: %s", tofile);
             goto out;
         }
         http_socket_set_writefunction(sock, http_receive_file_callback, tf);

@@ -42,7 +42,7 @@ int  cpe_refresh_igd_wandevice(cwmp_t * cwmp, parameter_node_t * param_node, cal
     {
         for(tmp_param=child_param->next_sibling; tmp_param; )
         {
-            cwmp_log_info("refresh WANDevice node, delete param %s\n", tmp_param->name);
+            cwmp_log_info("refresh WANDevice node, delete param %s", tmp_param->name);
             tmp_node = tmp_param->next_sibling;
             cwmp_model_delete_parameter(tmp_param);
             tmp_param = tmp_node;
