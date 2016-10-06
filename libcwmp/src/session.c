@@ -451,10 +451,11 @@ int cwmp_session_connect(cwmp_session_t * session, const char * url)
 
 int cwmp_session_set_auth(cwmp_session_t * session, const char * user, const char * pwd)
 {
+    cwmp_log_trace("%s(session=%p, user=\"%s\", pwd=\"%s\")",
+            __func__, (void*)session, user, pwd);
     if (*user && *pwd) {
-        session->dest->auth_type = HTTP_DIGEST_AUTH;
-        TRstrncpy(session->dest->user, user, URL_USER_LEN);
-        TRstrncpy(session->dest->password, pwd, URL_PWD_LEN);
+        TRstrncpy(session->dest->auth.username, user, URL_USER_LEN);
+        TRstrncpy(session->dest->auth.password, pwd, URL_PWD_LEN);
     }
 
     return CWMP_OK;

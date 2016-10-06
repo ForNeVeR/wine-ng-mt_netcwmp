@@ -329,11 +329,11 @@ void cwmp_agent_start_session(cwmp_t * cwmp)
                     if (session->resend_counter >= 2) {
                         cwmp_log_error("http session: ACS authorization failed");
                     }
-                    if (!session->dest->auth_type) {
+                    if (!*session->dest->auth.username || !*session->dest->auth.password) {
                         cwmp_log_error("http session: ACS authorization failed: no password or username");
                     } else {
                         cwmp_log_debug("http session: Send authorization credentials: '%s', for realm '%s'",
-                                session->dest->user, session->dest->auth.realm);
+                                session->dest->auth.username, session->dest->auth.realm);
                         session->status = CWMP_ST_SEND;
                         session->resend_counter++;
                     }

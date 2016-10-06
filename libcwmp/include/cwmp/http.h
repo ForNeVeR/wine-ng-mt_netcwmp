@@ -43,11 +43,11 @@
 #define HTTPP_VAR_ERROR_CODE    "__errorcode__"
 #define HTTPP_VAR_PASSWORD      "__password__"
 
-#define HTTP_NONE_AUTH      0x00
-#define HTTP_BASIC_AUTH     0x01
-#define HTTP_DIGEST_AUTH    0x02
-
-
+enum http_auth_type {
+	HTTP_NONE_AUTH	= 0x00,
+	HTTP_BASIC_AUTH	= 0x01,
+	HTTP_DIGEST_AUTH = 0x02,
+};
 
 #define HTTP_100		100
 #define HTTP_200		200
@@ -90,8 +90,10 @@ typedef size_t (*http_write_callback_pt)(char *data, size_t size, size_t nmemb, 
 
 struct http_digest_auth_t
 {
+	enum http_auth_type type;
 	 /* CDRouter will test largest size ConnectionRequest Username */
-	char	username[256];
+	char	username[URL_USER_LEN+1];
+	char	password[URL_PWD_LEN+1];
 
 	char 	realm[MIN_DEFAULT_LEN+1];
     char    uri[MIN_DEFAULT_LEN*4+1];
@@ -123,10 +125,6 @@ struct http_dest_t
 
     int     port;
     char*   url;
-
-
-    char    user[URL_USER_LEN+1];
-    char    password[URL_PWD_LEN+1];
 
     const char *    proxy_name;
     const char *    proxy_auth;

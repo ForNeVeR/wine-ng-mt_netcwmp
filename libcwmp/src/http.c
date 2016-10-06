@@ -770,7 +770,7 @@ int http_parse_url(http_dest_t * dest, const char * url)
         for (q = uri, i = 0; (*q != ':') && (*q != '@'); q++)
             if (i < URL_USER_LEN)
             {
-                dest->user[i++] = *q;
+                dest->auth.username[i++] = *q;
             }
 
         /* password */
@@ -778,7 +778,7 @@ int http_parse_url(http_dest_t * dest, const char * url)
             for (q++, i = 0; (*q != ':') && (*q != '@'); q++)
                 if (i < URL_PWD_LEN)
                 {
-                    dest->password[i++] = *q;
+                    dest->auth.password[i++] = *q;
                 }
 
         p++;
@@ -874,7 +874,7 @@ nohost:
         "host:     [%s]\n"
         "port:     [%d]\n"
         "uri: [%s]\n",
-        dest->scheme, dest->user, dest->password,
+        dest->scheme, dest->auth.username, dest->auth.password,
         dest->host, dest->port, dest->uri);
 
     return CWMP_OK;
@@ -1714,9 +1714,16 @@ int http_parse_digest_auth(const char * auth, http_digest_auth_t * digest_auth, 
     for (s =  (char*)auth; isspace(*s); s++);
     strncpy(data, s, 511);
     s = data;
-    if (TRstrncasecmp(s, "digest", 6) != 0)
+    if (!strncasecmp(s, "Digest", 6)) {
+        digest_auth->type = HTTP_DIGEST_AUTH;
+        for (s += 6;  isspace(*s); s++);
+    } else if (!strncasecmp(s, "Basic", 5)) {
+        digest_auth->type = HTTP_BASIC_AUTH;
+        for (s += 5;  isspace(*s); s++);
+    } else {
+        cwmp_log_error("%s: unknown auth string: %s", __func__, auth);
         return -1;
-    for (s += 6;  isspace(*s); s++);
+    }
 
     end = s + strlen(s);
     memset(buffer, 0, 128);
@@ -1771,7 +1778,10 @@ int http_parse_digest_auth(const char * auth, http_digest_auth_t * digest_auth, 
         TRstrncpy(digest_auth->response, response, sizeof(digest_auth->response));
     }
 	TRstrncpy(digest_auth->opaque, opaque, MIN_DEFAULT_LEN);
-    TRstrncpy(digest_auth->username, user, sizeof(user));
+
+    if (*user) {
+        TRstrncpy(digest_auth->username, user, sizeof(user));
+    }
 
     cwmp_log_debug("user[%s], realm[%s], "
 			"nonce[%s], response[%s], uri[%s], "
@@ -1833,17 +1843,17 @@ int http_write_request(http_socket_t * sock, http_request_t * request, cwmp_chun
                 "Content-Length: %d\r\n", len2 + additional_len);
     }
 
-	if(dest->auth_type == HTTP_DIGEST_AUTH && *dest->auth.realm)
+	if(dest->auth.type == HTTP_DIGEST_AUTH)
 	{
 		http_calc_digest_response(http_method(request->method),
-				dest->user, dest->password, &dest->auth);
+				dest->auth.username, dest->auth.password, &dest->auth);
 
 		/* formatting authorization string */
 		len1 += TRsnprintf(buffer + len1, sizeof(buffer) - len1,
 				"Authorization: Digest "
 				"username=\"%s\", realm=\"%s\", nonce=\"%s\", "
 				"uri=\"%s\", response=\"%s\"",
-				dest->user, dest->auth.realm, dest->auth.nonce,
+				dest->auth.username, dest->auth.realm, dest->auth.nonce,
 				dest->auth.uri, dest->auth.response
 				);
 
@@ -1859,7 +1869,17 @@ int http_write_request(http_socket_t * sock, http_request_t * request, cwmp_chun
 					dest->auth.opaque);
 		}
 		len1 += TRsnprintf(buffer + len1, sizeof(buffer) - len1, "\r\n");
-	}
+	} else if (dest->auth.type == HTTP_BASIC_AUTH)
+    {
+        char basic[1024] = {};
+        char *basic_64 = NULL;
+        snprintf(basic, sizeof(basic), "%s:%s", dest->auth.username, dest->auth.password);
+        if ((basic_64 = cwmp_base64_encode(basic)) != NULL) {
+            len1 += snprintf(buffer + len1, sizeof(buffer) - len1,
+                    "Authorization: Basic %s\r\n", basic_64);
+            free(basic_64);
+        }
+    }
 
     if(dest->cookie[0] != '\0')
     {
@@ -2003,7 +2023,6 @@ int http_send_diagnostics(size_t size, const char *tourl, struct http_statistics
         if (!auth) {
             goto end;
         }
-        request->dest->auth_type = HTTP_DIGEST_AUTH;
         http_parse_digest_auth(auth, &request->dest->auth, request->dest->uri);
         http_write_request(sock, request, NULL, size, pool);
         rc = http_read_response(sock, response, pool);

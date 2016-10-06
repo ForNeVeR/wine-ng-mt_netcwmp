@@ -134,13 +134,13 @@ upgrade_set_status(enum upgrade_status s)
 	return true;
 }
 
-/*
+
 static const char base64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789+/";
 
-static char * base64_encode(const char *src)
+char * cwmp_base64_encode(const char *src)
 {
     char *str, *dst;
     size_t l;
@@ -191,7 +191,7 @@ static char * base64_encode(const char *src)
     *dst = 0;
     return (str);
 }
-*/
+
 void cwmp_hex_to_string(char *to, const unsigned char *p, size_t len)
 {
     const char  *hex = "0123456789abcdef";
