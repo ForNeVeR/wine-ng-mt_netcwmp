@@ -584,11 +584,10 @@ static void _print_param(parameter_node_t * param, int level)
     char func[64] = {};
     char log[256] = {};
 
-    snprintf(log, sizeof(log), "|%-*s%s (%s): ",
+    snprintf(log, sizeof(log), "|%-*s%s (%p): ",
             level * 4,
             "----",
-            param->name,
-            param->parent ? param->parent->name : "-");
+            param->name, (void*)param);
 
     if (param->reload) {
         snprintf(func, sizeof(func), "reload=%p[%s]%s",

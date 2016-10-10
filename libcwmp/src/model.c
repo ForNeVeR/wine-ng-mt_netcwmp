@@ -422,7 +422,7 @@ int cwmp_model_delete_object_child(cwmp_t *cwmp, parameter_node_t *param)
 	if (!param)
 		return CWMP_ERROR;
 
-	param = param->child;
+	pn = param = param->child;
 	while (pn) {
 		pn = param;
 		param = param->next_sibling;
