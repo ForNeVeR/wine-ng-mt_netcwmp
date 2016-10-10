@@ -10,14 +10,15 @@ build netcwmp:
 
 1) ./configure
 
-#with openssl
-./configure --with-openssl=<openssl-path>
+    #with openssl
+    ./configure --with-openssl=<openssl-path>
 
 2) make
 
 3) make install
 
-#copy conf/cwmp.conf to /etc
+    #copy conf/cwmp.conf to /etc
+
 4) cp conf/cwmp.conf /etc
 
 5) run# cwmpd
